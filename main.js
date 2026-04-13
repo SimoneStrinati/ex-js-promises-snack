@@ -6,6 +6,18 @@
 // Crea una funzione getPost(id) che recupera l'intero post. Concatena una seconda chiamata che aggiunge una proprietà user che contiene i dati dell'autore, recuperati dalla chiamata https://dummyjson.com/users/{post.userId}.
 
 
+function getPostTitle(id) {
+    return new Promise((resolve, reject) => {
+        fetch(`https://dummyjson.com/posts/${id}`)
+        .then(res => res.json())
+        .then(post => resolve(post.title))
+        .catch(err => reject(err)) // oppure si potrebbe usare .catch(reject)
+    });
+};
+
+getPostTitle(1)
+    .then(title => console.log(`Il titolo del post è: ${title}`))
+    .catch(err => console.error(err));
 
 
 
