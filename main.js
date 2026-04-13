@@ -54,22 +54,61 @@
 
 
 
-function lanciaDado() {
-    return new Promise((resolve, reject) => {
-        console.log("Lancio il dado...");
-        setTimeout(() => {
-            const randomNum = Math.floor(Math.random() * 6) + 1;
-            const isStuck = Math.random() < 0.2; 
-            if (isStuck) {
-                reject("Il dado si è incastrato!");
-            } else {
-                resolve(randomNum);
-            }
-        }, 3000); // 3 secondi
-    });
+// function lanciaDado() {
+//     return new Promise((resolve, reject) => {
+//         console.log("Lancio il dado...");
+//         setTimeout(() => {
+//             const randomNum = Math.floor(Math.random() * 6) + 1;
+//             const isStuck = Math.random() < 0.2; 
+//             if (isStuck) {
+//                 reject("Il dado si è incastrato!");
+//             } else {
+//                 resolve(randomNum);
+//             }
+//         }, 3000); // 3 secondi
+//     });
+// };
+
+// lanciaDado()
+//     .then(num => console.log(`Hai lanciato un ${num}`))
+//     .catch(err => console.error(err));
+
+// Bonus: HOF con closure per memorizzare l'ultimo lancio
+
+
+function creaLanciaDado() {
+    let ultimoLancio = null;
+
+    return function () {
+        return new Promise((resolve, reject) => {
+            console.log("Lancio il dado...");
+            setTimeout(() => {
+                const randomNum = Math.floor(Math.random() * 6) + 1;
+                if (Math.random() < 0.2) {
+                    ultimoLancio = null; // resetto l'ultimo lancio se il dado si incastra
+                    reject("Il dado si è incastrato!");
+                } else {
+                    if (randomNum === ultimoLancio) {
+                        console.log("Incredibile! Hai ottenuto lo stesso numero due volte di fila!");
+                    }
+                    ultimoLancio = randomNum; // aggiorno l'ultimo lancio
+                    resolve(randomNum);
+                }
+            }, 3000);
+        });
+    };
 };
 
-lanciaDado()
-    .then(num => console.log(`Hai lanciato un ${num}`))
-    .catch(err => console.error(err));  
+const lanciaDadoConMemoria = creaLanciaDado();
+
+lanciaDadoConMemoria()
+    .then(num => {
+        console.log(`Hai lanciato un ${num}`);
+        lanciaDadoConMemoria()
+            .then(num => console.log(`Hai lanciato un ${num}`))
+            .catch(err => console.error(err));
+    })
+    .catch(err => console.error(err));
+
+
 
